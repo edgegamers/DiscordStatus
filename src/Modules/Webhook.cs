@@ -68,10 +68,8 @@ namespace DiscordStatus
                         Embed embed = CreateStatusEmbed();
                         using (webhookClient) // Dispose of the client after use
                         {
-                            await webhookClient.ModifyMessageAsync(_g.MessageID, properties =>
-                            {
-                                properties.Embeds = new[] { embed };
-                            });
+                            await webhookClient.ModifyMessageAsync(_g.MessageID,
+                                properties => { properties.Embeds = new[] { embed }; });
                         }
                     }
                 }
@@ -96,11 +94,10 @@ namespace DiscordStatus
                 {
                     using (webhookClient) // Dispose of the client after use
                     {
-                        await webhookClient.ModifyMessageAsync(_g.MessageID, properties =>
-                        {
-                            properties.Embeds = new[] { CreateStatusEmbed() };
-                        });
+                        await webhookClient.ModifyMessageAsync(_g.MessageID,
+                            properties => { properties.Embeds = new[] { CreateStatusEmbed() }; });
                     }
+
                     DSLog.Log(1, $"Updated embed!");
                 }
                 catch (Exception ex)
@@ -126,22 +123,42 @@ namespace DiscordStatus
                 }
                 else
                 {
-                    ctnames = !ctplayersName.Any() ? "```ㅤ```" : $"```ansi\r\n\u001b[0;34m{string.Join("\n", ctplayersName)}\u001b[0m\r\n```";
-                    tnames = !tplayersName.Any() ? "```ㅤ```" : $"```ansi\r\n\u001b[0;33m{string.Join("\n", tplayersName)}\u001b[0m\r\n```";
+                    ctnames = !ctplayersName.Any()
+                        ? "```ㅤ```"
+                        : $"```ansi\r\n\u001b[0;34m{string.Join("\n", ctplayersName)}\u001b[0m\r\n```";
+                    tnames = !tplayersName.Any()
+                        ? "```ㅤ```"
+                        : $"```ansi\r\n\u001b[0;33m{string.Join("\n", tplayersName)}\u001b[0m\r\n```";
                 }
+
+                if (ctnames.Length > 1000)
+                    ctnames = ctnames.Substring(0, 1000) + "\nAnd more...";
+                if (tnames.Length > 1000)
+                    tnames = tnames.Substring(0, 1000) + "\nAnd more...";
+
                 EmbedBuilder builder = new EmbedBuilder()
                     .WithTitle(EConfig.Title)
-                    .AddField($"{EConfig.MapField}", $"```ansi\r\n\u001b[2;31m{_g.MapName}\u001b[0m\r\n```", inline: true)
-                    .AddField(EConfig.OnlineField, $"```ansi\r\n\u001b[2;31m{_g.PlayerList.Count}\u001b[0m/\u001b[2;32m{_g.MaxPlayers}\u001b[0m\r\n```", inline: true);
+                    .AddField($"{EConfig.MapField}", $"```ansi\r\n\u001b[2;31m{_g.MapName}\u001b[0m\r\n```",
+                        inline: true)
+                    .AddField(EConfig.OnlineField,
+                        $"```ansi\r\n\u001b[2;31m{_g.PlayerList.Count}\u001b[0m/\u001b[2;32m{_g.MaxPlayers}\u001b[0m\r\n```",
+                        inline: true);
                 _ = EConfig.PlayersInline ? builder.AddField("ㅤ", "​─────────────────────────────────────") : null;
                 _ = builder
-                    .AddField(EConfig.CTField.Replace("{SCORE}", _g.CTScore.ToString()), ctnames, inline: EConfig.PlayersInline)
-                    .AddField(EConfig.TField.Replace("{SCORE}", _g.TScore.ToString()), tnames, inline: EConfig.PlayersInline)
-                    .AddField("ㅤ", _chores.IsURLValid(GConfig.PHPURL) ? $"[**`connect {_g.ServerIP}`**]({_g.ConnectURL})ㅤ{EConfig.JoinHere}" : $"**`connect {_g.ServerIP}`**ㅤ{EConfig.JoinHere}")
+                    .AddField(EConfig.CTField.Replace("{SCORE}", _g.CTScore.ToString()), ctnames,
+                        inline: EConfig.PlayersInline)
+                    .AddField(EConfig.TField.Replace("{SCORE}", _g.TScore.ToString()), tnames,
+                        inline: EConfig.PlayersInline)
+                    .AddField("ㅤ",
+                        _chores.IsURLValid(GConfig.PHPURL)
+                            ? $"[**`connect {_g.ServerIP}`**]({_g.ConnectURL})ㅤ{EConfig.JoinHere}"
+                            : $"**`connect {_g.ServerIP}`**ㅤ{EConfig.JoinHere}")
                     .WithColor(_chores.GetEmbedColor())
                     .WithCurrentTimestamp();
                 _ = _chores.IsURLValid(_g.ConnectURL) ? builder.WithUrl(_g.ConnectURL) : null;
-                _ = _chores.IsURLValid(EConfig.MapImg) ? builder.WithImageUrl(EConfig.MapImg.Replace("{MAPNAME}", _g.MapName)) : null;
+                _ = _chores.IsURLValid(EConfig.MapImg)
+                    ? builder.WithImageUrl(EConfig.MapImg.Replace("{MAPNAME}", _g.MapName))
+                    : null;
                 return builder.Build();
             }
             else
@@ -149,12 +166,18 @@ namespace DiscordStatus
                 EmbedBuilder builder = new EmbedBuilder()
                     .WithTitle(EConfig.Title)
                     .AddField(EConfig.MapField, $"```ansi\r\n\u001b[2;31m{_g.MapName}\u001b[0m\r\n```", inline: true)
-                    .AddField(EConfig.OnlineField, $"```ansi\n[2;33m[2;31m{EConfig.ServerEmpty}[0m[2;33m[0m[2;33m[0m\n```", inline: true)
-                    .AddField("ㅤ", _chores.IsURLValid(GConfig.PHPURL) ? $"[**`connect {_g.ServerIP}`**]( {_g.ConnectURL})ㅤ{EConfig.JoinHere}" : $"**`connect {_g.ServerIP}`**ㅤ{EConfig.JoinHere}")
+                    .AddField(EConfig.OnlineField,
+                        $"```ansi\n[2;33m[2;31m{EConfig.ServerEmpty}[0m[2;33m[0m[2;33m[0m\n```", inline: true)
+                    .AddField("ㅤ",
+                        _chores.IsURLValid(GConfig.PHPURL)
+                            ? $"[**`connect {_g.ServerIP}`**]( {_g.ConnectURL})ㅤ{EConfig.JoinHere}"
+                            : $"**`connect {_g.ServerIP}`**ㅤ{EConfig.JoinHere}")
                     .WithColor(_chores.GetEmbedColor())
                     .WithCurrentTimestamp();
                 _ = _chores.IsURLValid(_g.ConnectURL) ? builder.WithUrl(_g.ConnectURL) : null;
-                _ = _chores.IsURLValid(EConfig.IdleImg) ? builder.WithImageUrl(EConfig.IdleImg.Replace("{MAPNAME}", _g.MapName)) : null;
+                _ = _chores.IsURLValid(EConfig.IdleImg)
+                    ? builder.WithImageUrl(EConfig.IdleImg.Replace("{MAPNAME}", _g.MapName))
+                    : null;
                 return builder.Build();
             }
         }
@@ -171,13 +194,22 @@ namespace DiscordStatus
 
                 EmbedBuilder builder = new EmbedBuilder()
                     .WithTitle(EConfig.Title)
-                    .WithDescription($"||<@&{WConfig.NotifyMembersRoleID}>||\n```ansi\r\n\u001b[2;31m{name} {EConfig.RequestPlayers}\u001b[0m\r\n```")
-                    .AddField($"{EConfig.MapField}", $"```ansi\r\n\u001b[2;31m{_g.MapName}\u001b[0m\r\n```", inline: true)
-                    .AddField(EConfig.OnlineField, $"```ansi\r\n\u001b[2;31m{_g.PlayerList.Count}\u001b[0m/\u001b[2;32m{_g.MaxPlayers}\u001b[0m\r\n```", inline: true)
-                    .AddField("ㅤ", _chores.IsURLValid(GConfig.PHPURL) ? $"[**`connect {_g.ServerIP}`**]({_g.ConnectURL})ㅤ{EConfig.JoinHere}" : $"**`connect {_g.ServerIP}`**ㅤ{EConfig.JoinHere}")
+                    .WithDescription(
+                        $"||<@&{WConfig.NotifyMembersRoleID}>||\n```ansi\r\n\u001b[2;31m{name} {EConfig.RequestPlayers}\u001b[0m\r\n```")
+                    .AddField($"{EConfig.MapField}", $"```ansi\r\n\u001b[2;31m{_g.MapName}\u001b[0m\r\n```",
+                        inline: true)
+                    .AddField(EConfig.OnlineField,
+                        $"```ansi\r\n\u001b[2;31m{_g.PlayerList.Count}\u001b[0m/\u001b[2;32m{_g.MaxPlayers}\u001b[0m\r\n```",
+                        inline: true)
+                    .AddField("ㅤ",
+                        _chores.IsURLValid(GConfig.PHPURL)
+                            ? $"[**`connect {_g.ServerIP}`**]({_g.ConnectURL})ㅤ{EConfig.JoinHere}"
+                            : $"**`connect {_g.ServerIP}`**ㅤ{EConfig.JoinHere}")
                     .WithColor(new Color(255, 0, 0))
                     .WithCurrentTimestamp();
-                _ = _chores.IsURLValid(EConfig.RequestImg) ? builder.WithImageUrl(EConfig.RequestImg.Replace("{MAPNAME}", _g.MapName)) : null;
+                _ = _chores.IsURLValid(EConfig.RequestImg)
+                    ? builder.WithImageUrl(EConfig.RequestImg.Replace("{MAPNAME}", _g.MapName))
+                    : null;
                 _ = builder.Build();
                 using (webhookClient) // Dispose of the client after use
                 {
@@ -198,14 +230,22 @@ namespace DiscordStatus
 
                 EmbedBuilder builder = new EmbedBuilder()
                     .WithTitle(EConfig.Title)
-                    .WithDescription($"```ansi\r\n\u001b[2;31m{EConfig.MapChange.Replace("{mapname}", mapname)}\u001b[0m\r\n```")
+                    .WithDescription(
+                        $"```ansi\r\n\u001b[2;31m{EConfig.MapChange.Replace("{mapname}", mapname)}\u001b[0m\r\n```")
                     .AddField($"{EConfig.MapField}", $"```ansi\r\n\u001b[2;31m{mapname}\u001b[0m\r\n```", inline: true)
-                    .AddField(EConfig.OnlineField, $"```ansi\r\n\u001b[2;31m{counts}\u001b[0m/\u001b[2;32m{_g.MaxPlayers}\u001b[0m\r\n```", inline: true)
-                    .AddField("ㅤ", _chores.IsURLValid(GConfig.PHPURL) ? $"[**`connect {_g.ServerIP}`**]({_g.ConnectURL})ㅤ{EConfig.JoinHere}" : $"**`connect {_g.ServerIP}`**ㅤ{EConfig.JoinHere}")
+                    .AddField(EConfig.OnlineField,
+                        $"```ansi\r\n\u001b[2;31m{counts}\u001b[0m/\u001b[2;32m{_g.MaxPlayers}\u001b[0m\r\n```",
+                        inline: true)
+                    .AddField("ㅤ",
+                        _chores.IsURLValid(GConfig.PHPURL)
+                            ? $"[**`connect {_g.ServerIP}`**]({_g.ConnectURL})ㅤ{EConfig.JoinHere}"
+                            : $"**`connect {_g.ServerIP}`**ㅤ{EConfig.JoinHere}")
                     .WithColor(_chores.GetEmbedColor())
                     .WithCurrentTimestamp();
                 _ = _chores.IsURLValid(_g.ConnectURL) ? builder.WithUrl(_g.ConnectURL) : null;
-                _ = _chores.IsURLValid(EConfig.MapImg) ? builder.WithImageUrl(EConfig.MapImg.Replace("{MAPNAME}", mapname)) : null;
+                _ = _chores.IsURLValid(EConfig.MapImg)
+                    ? builder.WithImageUrl(EConfig.MapImg.Replace("{MAPNAME}", mapname))
+                    : null;
                 _ = builder.Build();
                 using (webhookClient) // Dispose of the client after use
                 {
@@ -239,17 +279,28 @@ namespace DiscordStatus
                     }
                     else
                     {
-                        ctnames = !ctplayersName.Any() ? "```ㅤ```" : $"```ansi\r\n\u001b[0;34m{string.Join("\n", ctplayersName)}\u001b[0m\r\n```";
-                        tnames = !tplayersName.Any() ? "```ㅤ```" : $"```ansi\r\n\u001b[0;33m{string.Join("\n", tplayersName)}\u001b[0m\r\n```";
+                        ctnames = !ctplayersName.Any()
+                            ? "```ㅤ```"
+                            : $"```ansi\r\n\u001b[0;34m{string.Join("\n", ctplayersName)}\u001b[0m\r\n```";
+                        tnames = !tplayersName.Any()
+                            ? "```ㅤ```"
+                            : $"```ansi\r\n\u001b[0;33m{string.Join("\n", tplayersName)}\u001b[0m\r\n```";
                     }
+
                     EmbedBuilder builder = new EmbedBuilder()
                         .WithTitle(EConfig.Title)
-                        .WithDescription($"```ansi\r\n\u001b[2;31mServer: {_g.ServerIP}\nGameID: {timestamp} \u001b[0m\r\n```Time: <t:{timestamp}:f>")
-                        .AddField($"{EConfig.MapField}", $"```ansi\r\n\u001b[2;31m{_g.MapName}\u001b[0m\r\n```", inline: true)
-                        .AddField(EConfig.OnlineField, $"```ansi\r\n\u001b[2;31m{_g.PlayerList.Count}\u001b[0m/\u001b[2;32m{_g.MaxPlayers}\u001b[0m\r\n```", inline: true)
+                        .WithDescription(
+                            $"```ansi\r\n\u001b[2;31mServer: {_g.ServerIP}\nGameID: {timestamp} \u001b[0m\r\n```Time: <t:{timestamp}:f>")
+                        .AddField($"{EConfig.MapField}", $"```ansi\r\n\u001b[2;31m{_g.MapName}\u001b[0m\r\n```",
+                            inline: true)
+                        .AddField(EConfig.OnlineField,
+                            $"```ansi\r\n\u001b[2;31m{_g.PlayerList.Count}\u001b[0m/\u001b[2;32m{_g.MaxPlayers}\u001b[0m\r\n```",
+                            inline: true)
                         .AddField($"{EConfig.MVPField}", $"{mvp}", inline: false)
-                        .AddField(EConfig.CTField.Replace("{SCORE}", _g.CTScore.ToString()), ctnames, inline: EConfig.PlayersInline)
-                        .AddField(EConfig.TField.Replace("{SCORE}", _g.TScore.ToString()), tnames, inline: EConfig.PlayersInline)
+                        .AddField(EConfig.CTField.Replace("{SCORE}", _g.CTScore.ToString()), ctnames,
+                            inline: EConfig.PlayersInline)
+                        .AddField(EConfig.TField.Replace("{SCORE}", _g.TScore.ToString()), tnames,
+                            inline: EConfig.PlayersInline)
                         .WithColor(_chores.GetEmbedColor())
                         .WithCurrentTimestamp();
                     using (webhookClient) // Dispose of the client after use
@@ -270,13 +321,14 @@ namespace DiscordStatus
                 {
                     continue;
                 }
+
                 await webhookClient.ModifyMessageAsync(_g.MessageID, properties =>
                 {
                     EmbedBuilder builder = new EmbedBuilder()
-                    .WithTitle(EConfig.Title + " (Offline)")
-                    .WithDescription($"```ansi\r\n\u001b[2;31mOffline since: \u001b[0m\r\n```<t:{timestamp}:R>")
-                    .WithColor(new Color(255, 0, 0))
-                    .WithCurrentTimestamp();
+                        .WithTitle(EConfig.Title + " (Offline)")
+                        .WithDescription($"```ansi\r\n\u001b[2;31mOffline since: \u001b[0m\r\n```<t:{timestamp}:R>")
+                        .WithColor(new Color(255, 0, 0))
+                        .WithCurrentTimestamp();
                     _ = _chores.IsURLValid(EConfig.OfflineImg) ? builder.WithImageUrl(EConfig.OfflineImg) : null;
                     properties.Embeds = new[] { builder.Build() };
                 });
