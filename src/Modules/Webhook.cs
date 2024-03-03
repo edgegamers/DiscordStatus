@@ -129,6 +129,12 @@ namespace DiscordStatus
                     ctnames = !ctplayersName.Any() ? "```ㅤ```" : $"```ansi\r\n\u001b[0;34m{string.Join("\n", ctplayersName)}\u001b[0m\r\n```";
                     tnames = !tplayersName.Any() ? "```ㅤ```" : $"```ansi\r\n\u001b[0;33m{string.Join("\n", tplayersName)}\u001b[0m\r\n```";
                 }
+
+                if(ctnames.Length > 100)
+                    ctnames = ctnames.Substring(0, 100) + "\nAnd more...";
+                if (tnames.Length > 1000)
+                    tnames = tnames.Substring(0, 1000) + "\nAnd more...";
+                
                 EmbedBuilder builder = new EmbedBuilder()
                     .WithTitle(EConfig.Title)
                     .AddField($"{EConfig.MapField}", $"```ansi\r\n\u001b[2;31m{_g.MapName}\u001b[0m\r\n```", inline: true)
